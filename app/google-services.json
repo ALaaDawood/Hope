@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "573598898385",
+    "firebase_url": "https://hopebook-adc2a.firebaseio.com",
+    "project_id": "hopebook-adc2a",
+    "storage_bucket": "hopebook-adc2a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573598898385:android:402189c61265aed1",
+        "android_client_info": {
+          "package_name": "com.example.android.hope"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "573598898385-tugpvttr48jijdn0lp1cdb1ij01n0tt0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android.hope",
+            "certificate_hash": "bcaed588a702cae58517a3da2e03101162dd199f"
+          }
+        },
+        {
+          "client_id": "573598898385-dourbs6jdec943mc1n9lsfvpnaqj3moa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIut4LsKl9zpsm9smPBtu40QgSBGI6PLo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573598898385-dourbs6jdec943mc1n9lsfvpnaqj3moa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

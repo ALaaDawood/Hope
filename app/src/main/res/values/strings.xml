@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Hope</string>
+    <string name="post_desc_hint">Add Description...</string>
+    <string name="new_post_btn_hint">Post</string>
+    <string name="action_setting_text">Account Settings</string>
+    <string name="action_logout_text">Logout</string>
+    <string-array name="role">
+        <item>Donor</item>
+        <item>Needer</item>
+    </string-array>
+</resources>
