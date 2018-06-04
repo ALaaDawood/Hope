@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import id.zelory.compressor.Compressor;
@@ -42,7 +41,7 @@ import id.zelory.compressor.Compressor;
 public class NewPostActivity extends AppCompatActivity {
 
 
-    private static final int MAX_LENGTH = 100;
+
     private Toolbar newPostToolbar;
     private ImageView newPostImage;
     private EditText newPostDesc;
@@ -141,7 +140,7 @@ public class NewPostActivity extends AppCompatActivity {
 
                                         Map<String, Object> postMap = new HashMap<>();
                                         postMap.put("image_url", downloadUri);
-                                        postMap.put("thumb", downloadthumbUri);
+                                        postMap.put("image_thumb", downloadthumbUri);
                                         postMap.put("desc", desc);
                                         postMap.put("user_id", current_user_id);
                                         postMap.put("timestamp", FieldValue.serverTimestamp());
@@ -209,18 +208,6 @@ public class NewPostActivity extends AppCompatActivity {
                 Exception error = result.getError();
             }
         }
-    }
-
-    public static String random() {
-        Random generator = new Random();
-        StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = generator.nextInt(MAX_LENGTH);
-        char tempChar;
-        for (int i = 0; i < randomLength; i++){
-            tempChar = (char) (generator.nextInt(96) + 32);
-            randomStringBuilder.append(tempChar);
-        }
-        return randomStringBuilder.toString();
     }
 
 }
