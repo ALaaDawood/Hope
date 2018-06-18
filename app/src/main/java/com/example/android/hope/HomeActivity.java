@@ -45,51 +45,58 @@ public class HomeActivity extends AppCompatActivity {
 
         mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+
         getSupportActionBar().setTitle("Hope Book");
 
-        mainBottomNav = findViewById(R.id.mainBottomNav);
+        if(mAuth.getCurrentUser() != null) {
 
-        //FRAGMENTS
-        homeFragment = new HomeFragment();
-        notificationFragment = new NotificationFragment();
-        accountFragment = new AccountFragment();
+            mainBottomNav = findViewById(R.id.mainBottomNav);
 
-        mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            //FRAGMENTS
+            homeFragment = new HomeFragment();
+            notificationFragment = new NotificationFragment();
+            accountFragment = new AccountFragment();
 
-                switch (item.getItemId()){
+            replaceFragment(homeFragment);
 
-                    case R.id.bottom_action_home :
-                        replaceFragment(homeFragment);
-                        return true;
+            mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                    case R.id.bottom_action_notif :
-                        replaceFragment(notificationFragment);
-                        return true;
+                    switch (item.getItemId()) {
 
-                    case R.id.bottom_action_account :
-                        replaceFragment(accountFragment);
-                        return true;
+                        case R.id.bottom_action_home:
+                            replaceFragment(homeFragment);
+                            return true;
+
+                        case R.id.bottom_action_notif:
+                            replaceFragment(notificationFragment);
+                            return true;
+
+                        case R.id.bottom_action_account:
+                            replaceFragment(accountFragment);
+                            return true;
 
                         default:
                             return false;
+                    }
+
+
                 }
+            });
 
 
-            }
-        });
+            addPostBtn = findViewById(R.id.add_post_btn);
+            addPostBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
+                    Intent newPostIntent = new Intent(HomeActivity.this, NewPostActivity.class);
+                    startActivity(newPostIntent);
+                }
+            });
 
-        addPostBtn = findViewById(R.id.add_post_btn);
-        addPostBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent newPostIntent = new Intent(HomeActivity.this, NewPostActivity.class);
-                startActivity(newPostIntent);
-            }
-        });
+        }
 
 
 
