@@ -27,10 +27,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class Login extends AppCompatActivity {
 
@@ -42,6 +47,10 @@ public class Login extends AppCompatActivity {
     private List<Address> addresses;
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+    private StorageReference storageRefrence;
+    private FirebaseFirestore firebaseFirestore;
+
 
     private FirebaseAuth mAuth;
     @Override
@@ -57,9 +66,14 @@ public class Login extends AppCompatActivity {
         loginregbtn = (Button) findViewById(R.id.login_reg_btn);
         loginProgress =(ProgressBar) findViewById(R.id.login_progress);
 
+        storageRefrence = FirebaseStorage.getInstance().getReference();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
         // الحاجات اللى هستخدمها فى تحديد الموقع
         geocoder = new Geocoder(this, Locale.getDefault());
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+
 
         loginregbtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,7 +114,7 @@ public class Login extends AppCompatActivity {
 
 
                 }else {
-                    Toast.makeText(Login.this, "please fill in the required feilds", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Login.this, "please fill in the required fields", Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -140,17 +154,42 @@ public class Login extends AppCompatActivity {
                     // هنا بجيب بقى العنوان اللى بتدل عليه الاحداثيات دى ، انا هنا سبتهم ليكى زيادة عشان لو عايزاهم ولا حاجة
                     addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                     String address = addresses.get(0).getAddressLine(0); // عشان اجيب العنوان كلها
-                    String area = addresses.get(0).getLocality(); // الشارع
-                    String city = addresses.get(0).getAdminArea(); // المدينة
+                    String city = addresses.get(0).getLocality(); // الشارع
+                    String govern = addresses.get(0).getAdminArea(); // المدينة
                     String country = addresses.get(0).getCountryName(); //البلد
 
-                    Toast.makeText(getApplicationContext(), "Mobile Location (NW): \nLatitude: " + latitude + "\nLongitude: " + longitude,
-                            Toast.LENGTH_LONG).show();
+
+                    String user_id = mAuth.getCurrentUser().getUid();
+
+                    Map<String, Object> locationMap = new HashMap<>();
+                    locationMap.put("city", city);
+                    locationMap.put("govern", govern);
+                    locationMap.put("address", address);
+
+
+                    firebaseFirestore.collection("Location").document(user_id).set(locationMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            if(task.isSuccessful()){
+
+                                Toast.makeText(Login.this, "The location updated", Toast.LENGTH_LONG).show();
+
+                            }else{
+
+                                String error = task.getException().getMessage();
+                                Toast.makeText(Login.this, "Error :" + error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
 
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+
 
             }
 
@@ -167,7 +206,7 @@ public class Login extends AppCompatActivity {
             //checks if network provider is turned off , if turned off go to settings to turn on
             @Override
             public void onProviderDisabled(String s) {
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(getApplicationContext()); //هى المشكلة فى الحتة دى
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(Login.this); //هى المشكلة فى الحتة دى
 
                 alertDialog.setTitle("Network" + " SETTINGS");
 

@@ -28,6 +28,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
     public Context context;
     public FirebaseFirestore firebaseFirestore;
 
+
     public BlogRecyclerAdapter(List<BlogPost> blog_list){
 
         this.blog_list = blog_list;
@@ -64,7 +65,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
                     String userName = task.getResult().getString("name");
                     String userImage = task.getResult().getString("image");
-                    //اللوكيشن من هنا
+
 
                     holder.setUserData(userName, userImage);
 
@@ -75,6 +76,27 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
             }
         });
+        ////////////////////////////////////////////////////////////////
+
+        firebaseFirestore.collection("Location").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if(task.isSuccessful()){
+
+                    String city = task.getResult().getString("city");
+                    String governrate = task.getResult().getString("govern");
+
+                    holder.setUserLocate(city, governrate);
+
+
+                }else{
+
+                    //Firebase Exception
+                }
+            }
+        });
+
 
         long millisecond = blog_list.get(position).getTimestamp().getTime();
         String dateString = DateFormat.format("dd/MM/yyyy", new Date(millisecond)).toString();
@@ -131,7 +153,6 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
             blogUserImage = mView.findViewById(R.id.blog_user_image);
             blogUserName = mView.findViewById(R.id.blog_user_name);
-            userLocation = mView.findViewById(R.id.blog_location);
 
             blogUserName.setText(name);
 
@@ -139,6 +160,16 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             placeholderOptions.placeholder(R.drawable.profile_placeholder);
 
             Glide.with(context).applyDefaultRequestOptions(placeholderOptions).load(image).into(blogUserImage);
+        }
+
+        public void setUserLocate(String city, String govern){
+
+
+            userLocation = mView.findViewById(R.id.blog_location);
+
+            userLocation.setText(city + "," + govern);
+
+
         }
 
     }
