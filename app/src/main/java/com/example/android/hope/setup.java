@@ -13,9 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -41,10 +43,12 @@ public class setup extends AppCompatActivity {
     private CircleImageView setupImage;
     private  Uri mainImageURI = null;
     private EditText setupName ;
+    private EditText setupPhone;
     //private  EditText setOldPass  ;
     //private EditText setNewPass ;
     //private EditText setConfirmPass ;
     private Button setupBtn ;
+    private Spinner roleSpinner;
     private String user_id;
     private Boolean isChanged = false;
     private ProgressBar setupProgress;
@@ -69,7 +73,19 @@ public class setup extends AppCompatActivity {
 
 
         setupImage =  findViewById(R.id.setup_image);
-        setupName  =  findViewById(R.id.editText);
+        setupName  =  findViewById(R.id.setup_name);
+        setupPhone = findViewById(R.id.setup_phone);
+        roleSpinner = findViewById(R.id.role_spinner);
+
+        Spinner spinner = (Spinner) findViewById(R.id.role_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.role, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
         /*setOldPass =  findViewById(R.id.setup_old_password) ;
         setNewPass =  findViewById(R.id.setup_new_password);
         setConfirmPass = findViewById(R.id.setup_confirm_password) ; */
@@ -88,9 +104,13 @@ public class setup extends AppCompatActivity {
 
                         String name = task.getResult().getString("name");
                         String image = task.getResult().getString("image");
+                        String phone =task.getResult().getString("phone");
+                        String role = task.getResult().getString("role");
 
                         mainImageURI = Uri.parse(image);
                         setupName.setText(name);
+                        setupPhone.setText(phone);
+
 
                         RequestOptions placeholderRequest = new RequestOptions();
                         placeholderRequest.placeholder(R.drawable.profilesetup);
@@ -120,7 +140,10 @@ public class setup extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final String user_name = setupName.getText().toString();
-                if (!TextUtils.isEmpty(user_name) && mainImageURI != null) {
+                final String user_phone = setupPhone.getText().toString();
+                final String role = roleSpinner.getSelectedItem().toString();
+
+                if (!TextUtils.isEmpty(user_name) && !TextUtils.isEmpty(role) && !TextUtils.isEmpty(user_phone) && mainImageURI != null) {
                 setupProgress.setVisibility(View.VISIBLE);
                 if (isChanged) {
 
@@ -133,7 +156,7 @@ public class setup extends AppCompatActivity {
 
                                 if (task.isSuccessful()) {
 
-                                    storeFirestore(task, user_name);
+                                    storeFirestore(task, user_name, user_phone,  role);
 
 
                                 } else {
@@ -149,7 +172,8 @@ public class setup extends AppCompatActivity {
 
                     }
                 else{
-                    storeFirestore(null, user_name);
+                    storeFirestore(null, user_name, user_phone, role);
+
                 }
 
                 }
@@ -180,7 +204,7 @@ public class setup extends AppCompatActivity {
 
     }
 
-    private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, String user_name) {
+    private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, String user_name, String user_phone, String role) {
 
         Uri download_uri;
         if(task!=null) {
@@ -194,6 +218,8 @@ public class setup extends AppCompatActivity {
         Map<String, String> userMap = new HashMap<>();
         userMap.put("name", user_name);
         userMap.put("image", download_uri.toString());
+        userMap.put("phone", user_phone);
+        userMap.put("role", role);
 
         firebaseFirestore.collection("Users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

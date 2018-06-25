@@ -10,8 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <ProgressBar
             android:id="@+id/login_progress"
@@ -23,7 +22,7 @@
         <ImageView
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:src="@drawable/logo"
+            android:src="@drawable/logoo"
             android:layout_gravity="center"/>
         <EditText
             android:id="@+id/login_email"
@@ -50,14 +49,24 @@
             android:layout_gravity="center"
             android:background="@color/colorPrimary"
             android:textColor="@color/colorAccent"/>
+
+        <Button
+            android:id="@+id/forgetPass_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/colorPrimary"
+            android:text="Forgot Password?"
+            android:textColor="@color/colorPrimaryDark" />
+
         <Button
             android:id="@+id/login_reg_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sign Up"
+            android:text="Need a new Account?"
             android:layout_gravity="center"
             android:background="@color/colorPrimary"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorPrimaryDark"
             />
 
 

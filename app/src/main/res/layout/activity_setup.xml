@@ -1,107 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".setup"
-    android:orientation="vertical"
-    android:background="@color/colorPrimary">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/setupToolbar"
+<ScrollView
         android:layout_width="match_parent"
-        app:titleTextColor="@color/colorPrimary"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccent"></android.support.v7.widget.Toolbar>
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".setup">
 
-    <ProgressBar
-        android:id="@+id/setup_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:visibility="invisible" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorPrimary">
 
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/setupToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorAccent"
+                app:titleTextColor="@color/colorPrimary"></android.support.v7.widget.Toolbar>
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/setup_image"
-        android:layout_width="154dp"
-        android:layout_height="143dp"
-        android:src="@drawable/profilesetup"
-        android:layout_margin="50dp"
-        android:layout_gravity="center"/>
+            <ProgressBar
+                android:id="@+id/setup_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:visibility="invisible"
+                android:layout_marginTop="5dp"/>
 
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:layout_marginBottom="30dp"
-        android:hint="Name"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"/>
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/setup_image"
+                android:layout_width="match_parent"
+                android:layout_height="185dp"
+                android:layout_gravity="center"
+                android:layout_margin="40dp"
+                android:src="@drawable/profilesetup" />
 
-   <!-- <EditText
-        android:id="@+id/setup_old_password"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="old password"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+            <EditText
+                android:id="@+id/setup_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="textPersonName"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/setup_new_password"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:ems="10"
-        android:hint="new password"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="375dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"/>
+            <EditText
+                android:id="@+id/setup_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:ems="10"
+                android:hint="@string/phone_number_setup"
+                android:inputType="textPersonName|phone"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/setup_confirm_password"
-        android:layout_width="375dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="confirm password"
-        android:inputType="numberPassword"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/setup_new_password" />
--->
-    <Button
-        android:id="@+id/setup_btn"
-        android:layout_width="match_parent"
-        android:layout_height="43dp"
-        android:background="@color/colorPrimaryDark"
-        android:text="save account setting "
-        android:textAllCaps="false"
-        android:textColor="@color/colorPrimary" />
+            <Spinner
+                android:id="@+id/role_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp"
+                android:textColor="@color/colorPrimaryDark" />
 
+            <Button
+                android:id="@+id/setup_btn"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:background="@color/colorPrimaryDark"
+                android:text="save account setting "
+                android:textAllCaps="false"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginBottom="20dp"/>
 
-</LinearLayout>
+        </LinearLayout>
+    </ScrollView>

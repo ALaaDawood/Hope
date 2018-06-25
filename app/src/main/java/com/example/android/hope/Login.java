@@ -41,6 +41,7 @@ public class Login extends AppCompatActivity {
 
     private EditText loginEmailText, loginPassText;
     private Button loginbtn, loginregbtn;
+    private Button forgetpassbtn;
     private ProgressBar loginProgress;
 
     private Geocoder geocoder;
@@ -64,7 +65,9 @@ public class Login extends AppCompatActivity {
         loginPassText = (EditText) findViewById(R.id.login_password);
         loginbtn = (Button) findViewById(R.id.login_btn);
         loginregbtn = (Button) findViewById(R.id.login_reg_btn);
+        forgetpassbtn = (Button) findViewById(R.id.forgetPass_btn);
         loginProgress =(ProgressBar) findViewById(R.id.login_progress);
+
 
         storageRefrence = FirebaseStorage.getInstance().getReference();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -84,6 +87,15 @@ public class Login extends AppCompatActivity {
             }
         });
 
+        forgetpassbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent forgetPassIntent = new Intent(Login.this, ResetPassword.class);
+                startActivity(forgetPassIntent);
+                finish();
+            }
+        });
 
         loginbtn.setOnClickListener(new View.OnClickListener() {
             @Override

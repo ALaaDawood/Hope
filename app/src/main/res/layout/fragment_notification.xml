@@ -3,12 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".NotificationFragment">
+    tools:context=".NotificationFragment"
+    android:background="@color/colorPrimaryDark">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Notification Fragment" />
+        android:layout_margin="15dp"
+        android:background="@drawable/fragment_background">
+
+
+    </RelativeLayout>
+
+    <!-- TODO: Update blank fragment layout -->
 
 </FrameLayout>

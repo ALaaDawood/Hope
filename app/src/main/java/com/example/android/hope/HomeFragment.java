@@ -60,6 +60,8 @@ public class HomeFragment extends Fragment {
         blog_list_view.setAdapter(blogRecyclerAdapter);
         blog_list_view.setHasFixedSize(true);
 
+
+
         if(firebaseAuth.getCurrentUser() != null) {
             firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -80,7 +82,7 @@ public class HomeFragment extends Fragment {
             if (firebaseAuth.getCurrentUser()!=null) {
                 firebaseFirestore = FirebaseFirestore.getInstance();
 
-                Query firstQuery = firebaseFirestore.collection("posts").orderBy("timestamp", Query.Direction.DESCENDING).limit(5);
+                Query firstQuery = firebaseFirestore.collection("posts").orderBy("timestamp", Query.Direction.DESCENDING).limit(3);
                 //limit دى يعني انا بقول الصفحه اكتر حاجه تتحمل فيها 5 بس
 
                 firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
@@ -130,7 +132,7 @@ public class HomeFragment extends Fragment {
             Query nextQuery = firebaseFirestore.collection("posts")
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .startAfter(lastVisible)
-                    .limit(5);
+                    .limit(3);
             //limit دى يعني انا بقول الصفحه اكتر حاجه تتحمل فيها 5 بس
 
             nextQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {

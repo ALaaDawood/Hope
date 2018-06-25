@@ -2,7 +2,6 @@ package com.example.android.hope;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
@@ -12,15 +11,14 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -29,17 +27,17 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapter.ViewHolder>{
+class ProfileRecyclerAdapter extends RecyclerView.Adapter<ProfileRecyclerAdapter.ViewHolder> {
 
     public List<BlogPost> blog_list;
     public Context context;
     public FirebaseFirestore firebaseFirestore;
     public Dialog myDialog ;
-    public Button donateButton;
-    public TextView markTaken;
+    public FirebaseAuth mAuth ;
+    public TextView blogName ;
 
 
-    public BlogRecyclerAdapter(List<BlogPost> blog_list){
+    public ProfileRecyclerAdapter(List<BlogPost> blog_list){
 
         this.blog_list = blog_list;
 
@@ -51,60 +49,21 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.blog_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_list_item, parent, false);
         final ViewHolder vHolder =new ViewHolder(view);
+
         context = parent.getContext();
         firebaseFirestore = FirebaseFirestore.getInstance();
-
-        donateButton = view.findViewById(R.id.donate_button);
 
         myDialog = new Dialog(parent.getContext());
         myDialog.setContentView(R.layout.dialog_contact);
         myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
-
-        vHolder.item_contact.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                final TextView dialog_name_tv = (TextView) myDialog.findViewById(R.id.dialog_name);
-                final TextView dialog_phone_tv = (TextView) myDialog.findViewById(R.id.dialog_phone);
-                final ImageView dialog_image_tv = (ImageView) myDialog.findViewById(R.id.dialog_image);
-                String contact_id =blog_list.get(vHolder.getAdapterPosition()).getUser_id() ;
-
-
-                firebaseFirestore.collection("Users").document(contact_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
-                        if(task.isSuccessful()){
-
-                            String userName = task.getResult().getString("name");
-                            String userImage = task.getResult().getString("image");
-                            String userPhone = task.getResult().getString("phone");
-                            dialog_name_tv.setText(userName);
-                            dialog_phone_tv.setText(userPhone);
-                            RequestOptions placeholderOptions = new RequestOptions();
-                            placeholderOptions.placeholder(R.drawable.profile_placeholder);
-                            Glide.with(context).applyDefaultRequestOptions(placeholderOptions).load(userImage).into(dialog_image_tv);
-
-                        }else{
-                            //Firebase Exception
-                        }
-
-
-                    }
-                });
-
-                Toast.makeText(parent.getContext(),"test click"+String.valueOf(vHolder.getAdapterPosition()),Toast.LENGTH_SHORT).show();
-                myDialog.show();
-            }
-        });
-
-
         return vHolder;
     }
+
+
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
@@ -116,54 +75,9 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         String thumbUri = blog_list.get(position).getImage_thumb();
         holder.setBlogImage(image_url, thumbUri);
 
-        final String user_id = blog_list.get(position).getUser_id();
-
-        donateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent creditIntent = new Intent(context, Credit.class);
-                //String message = creditIntent.getStringExtra("message");
-                boolean check = creditIntent.hasExtra("state");
-                context.startActivity(creditIntent);
-
-               // markTaken.setText(message);
+        String user_id = blog_list.get(position).getUser_id();
 
 
-                if(check){
-                    // IF the user donates successfully , make Donate button enabled False
-                    if (creditIntent.getStringExtra("state").equals("success")){
-                        donateButton.setEnabled(false);
-                    }else{
-                        donateButton.setEnabled(true);
-                    }
-                }
-                else{
-                    donateButton.setEnabled(true);
-                }
-
-               // message = creditIntent.getStringExtra("message");
-                check = creditIntent.hasExtra("state");
-
-                // To set Taken in Doante's textView
-                //markTaken = mView.findViewById(R.id.mark_post_taken);
-                //markTaken.setText(message);
-
-            }
-
-        });
-
-
-        /*donateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent sendIntent = new Intent(context, SendActivity.class);
-                sendIntent.putExtra("user_id", user_id);
-                context.startActivity(sendIntent);
-
-            }
-        });*/
         //retreive name and image of the user...
         firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -218,6 +132,8 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         return blog_list.size();
     }
 
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private View mView;
@@ -228,6 +144,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         private CircleImageView blogUserImage;
         private TextView blogUserName;
         private TextView userLocation;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -262,7 +179,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             blogDate = mView.findViewById(R.id.blog_date);
             blogDate.setText(date);
         }
-        //هنا هضيف براميتر للوكيشن برضه
+        //??? ???? ??????? ??????? ????
         public void setUserData(String name, String image){
 
             blogUserImage = mView.findViewById(R.id.blog_user_image);
@@ -273,7 +190,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             RequestOptions placeholderOptions = new RequestOptions();
             placeholderOptions.placeholder(R.drawable.profile_placeholder);
 
-            Glide.with(context.getApplicationContext()).applyDefaultRequestOptions(placeholderOptions).load(image).into(blogUserImage);
+            Glide.with(context).applyDefaultRequestOptions(placeholderOptions).load(image).into(blogUserImage);
         }
 
         public void setUserLocate(String city, String govern){

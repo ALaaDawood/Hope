@@ -14,4 +14,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="phone_number_setup">Phone Number...</string>
+    <string name="payment_amount">Payment Amount</string>
+    <string name="forget_password">Forgot Password?</string>
 </resources>

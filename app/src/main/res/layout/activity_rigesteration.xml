@@ -7,199 +7,97 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:orientation="vertical">
 
         <ProgressBar
             android:id="@+id/reg_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            android:indeterminate="true"/>
+            android:indeterminate="true"
+            android:layout_gravity="center"/>
+
         <ImageView
             android:id="@+id/userimg"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_below="@id/reg_progress"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:src="@drawable/user"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
             android:layout_marginTop="10dp"/>
 
-        <TextView
-            android:id="@+id/nameTV"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Name"
-            android:layout_below="@+id/userimg"
-            android:layout_margin="10dp"
-            android:paddingLeft="20dp"
-            android:textColor="@color/colorAccent"/>
 
         <EditText
             android:id="@+id/nameET"
-            android:layout_width="170dp"
+            android:layout_width="300dp"
+            android:layout_marginTop="16dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/nameTV"
-            android:layout_below="@+id/userimg"
-            android:layout_marginLeft="60dp"
-            android:textSize="15dp"
+            android:textSize="15sp"
+            android:layout_gravity="center"
             android:hint="your name"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/emailTV"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Email"
-            android:layout_below="@+id/nameET"
-            android:layout_margin="10dp"
-            android:paddingLeft="20dp"
-            android:textColor="@color/colorAccent"
-            />
-
         <EditText
             android:id="@+id/emailET"
-            android:layout_width="170dp"
+            android:layout_width="300dp"
+            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/nameTV"
-            android:layout_below="@+id/nameET"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:hint="your Email"
-            android:layout_marginLeft="60dp"
+            android:layout_gravity="center"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/phoneTV"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="phone"
-            android:layout_below="@+id/emailTV"
-            android:layout_margin="10dp"
-            android:paddingLeft="20dp"
-            android:textColor="@color/colorAccent"/>
-
-        <EditText
-            android:id="@+id/phoneET"
-            android:inputType="phone"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/phoneTV"
-            android:layout_below="@+id/emailET"
-            android:textSize="15dp"
-            android:hint="your phone number"
-            android:layout_marginLeft="60dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/addressTV"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Address"
-            android:layout_below="@+id/phoneTV"
-            android:paddingLeft="27dp"
-            android:textColor="@color/colorAccent"
-            />
-
-        <EditText
-            android:id="@+id/addressET"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/addressTV"
-            android:layout_below="@+id/phoneET"
-            android:hint="your Address"
-            android:textSize="15dp"
-            android:layout_marginLeft="60dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/passwordTV"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Password"
-            android:layout_below="@+id/addressET"
-            android:paddingLeft="27dp"
-            android:layout_marginTop="15dp"
-            android:textColor="@color/colorAccent"/>
 
         <EditText
             android:id="@+id/passwordET"
-            android:layout_width="170dp"
+            android:layout_width="300dp"
+            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/passwordTV"
-            android:layout_below="@+id/addressET"
+            android:textSize="15sp"
+            android:layout_gravity="center"
             android:hint="Your password"
             android:inputType="textPassword"
-            android:textSize="15dp"
-            android:layout_marginLeft="54dp"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/confirmPasswordTV"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Confirm Password"
-            android:layout_below="@+id/passwordET"
-            android:paddingLeft="20dp"
-            android:textColor="@color/colorAccent"
-            android:layout_marginTop="15dp"/>
 
         <EditText
             android:id="@+id/confirmPasswordET"
-            android:layout_width="170dp"
+            android:layout_width="300dp"
+            android:layout_marginTop="8dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/confirmPasswordTV"
-            android:layout_below="@+id/passwordET"
-            android:hint="Your password"
+            android:textSize="15sp"
+            android:layout_gravity="center"
+            android:hint="Retype Your password"
             android:inputType="textPassword"
-            android:textSize="15dp"
-            android:layout_marginLeft="10dp"
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/roleTV"
+        <Spinner
+             android:id="@+id/roleSpinner"
+             android:layout_width="300dp"
+             android:layout_marginTop="10dp"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center"
+             android:textColor="@color/colorPrimaryDark">
+
+         </Spinner>
+
+        <Button
+            android:id="@+id/btnsu"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:text="Role             "
-            android:layout_below="@+id/confirmPasswordTV"
-            android:layout_margin="10dp"
-            android:paddingLeft="20dp"
-            android:textColor="@color/colorAccent"/>
-
-     <Spinner
-         android:id="@+id/roleSpinner"
-         android:layout_width="200dp"
-         android:layout_below="@+id/confirmPasswordET"
-         android:layout_marginLeft="30dp"
-         android:layout_toRightOf="@id/roleTV"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="20dp"
-         android:textColor="@color/colorPrimaryDark">
-
-     </Spinner>
-    <Button
-        android:id="@+id/btnsu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SIGN UP"
-        android:layout_below="@id/roleSpinner"
-        android:layout_marginTop="30dp"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/colorAccent"
-        android:background="@color/colorPrimary"
-        android:textStyle="bold"/>
+            android:layout_height="wrap_content"
+            android:text="SIGN UP"
+            android:layout_gravity="center"
+            android:textColor="@color/colorAccent"
+            android:background="@color/colorPrimary"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/already"
-            android:layout_below="@id/btnsu"
-            android:layout_centerHorizontal="true"
+           android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Already have account ? "
@@ -207,14 +105,12 @@
             android:textStyle="bold"/>
         <TextView
             android:id="@+id/signin"
-            android:layout_toRightOf="@id/already"
-            android:layout_below="@+id/btnsu"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SIGN IN "
             android:textColor="@color/colorAccent"/>
 
 
-    </RelativeLayout>
+    </LinearLayout>
 </ScrollView>
