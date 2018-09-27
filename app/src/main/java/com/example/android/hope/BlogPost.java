@@ -2,22 +2,41 @@ package com.example.android.hope;
 
 import java.util.Date;
 
-public class BlogPost {
-    public String user_id, image_url, desc, image_thumb;
-    public Date timestamp;
+public class BlogPost extends ToUserID {
+    public String user_id, image_url, desc, image_thumb , donate_id  , city , govern  ;
+    public Date timestamp ;
 
 
 
 
     public BlogPost() {}
 
-    public BlogPost(String user_id, String image_url, String desc, String image_thumb, Date timestamp) {
-        this.user_id = user_id;
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getGovern() {
+        return govern;
+    }
+
+    public void setGovern(String govern) {
+        this.govern = govern;
+    }
+
+    public BlogPost(String user_id, String image_url, String desc, String image_thumbd, String donate_id, String city, String govern, Date timestamp) {
+        this.user_id = user_id ;
         this.image_url = image_url;
         this.desc = desc;
         this.image_thumb = image_thumb;
+        this.donate_id = donate_id ;
         this.timestamp = timestamp;
-
+        this.city = city ;
+        this.govern = govern ;
     }
 
     public String getUser_id() {
@@ -44,6 +63,7 @@ public class BlogPost {
         this.desc = desc;
     }
 
+
     public String getImage_thumb() {
         return image_thumb;
     }
@@ -61,6 +81,13 @@ public class BlogPost {
         this.timestamp = timestamp;
     }
 
+    public String getDonate_id() {
+        return donate_id;
+    }
+
+    public void setDonate_id(String donate_id) {
+        this.donate_id = donate_id;
+    }
 
 
 }

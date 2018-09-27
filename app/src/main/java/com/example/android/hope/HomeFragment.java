@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -99,7 +100,10 @@ public class HomeFragment extends Fragment {
 
                                 if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                    BlogPost blogPost = doc.getDocument().toObject(BlogPost.class);
+                                    String toUser_id = doc.getDocument().getId();
+                                    BlogPost blogPost = doc.getDocument().toObject(BlogPost.class).withId(toUser_id);
+
+
                                     if (isFirstPageFirstLoad) {
 
                                         blog_list.add(blogPost);
@@ -125,12 +129,19 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+   /* @Override
+    public void onResume() {
+        super.onResume();
+        lastVisible = null;
+        isFirstPageFirstLoad = true;
+    }*/
+
     public void loadMorePost() {
 
 
         if (firebaseAuth.getCurrentUser() != null) {
             Query nextQuery = firebaseFirestore.collection("posts")
-                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .orderBy("donate_timestamp", Query.Direction.DESCENDING)
                     .startAfter(lastVisible)
                     .limit(3);
             //limit دى يعني انا بقول الصفحه اكتر حاجه تتحمل فيها 5 بس
@@ -148,7 +159,9 @@ public class HomeFragment extends Fragment {
 
                             if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                BlogPost blogPost = doc.getDocument().toObject(BlogPost.class);
+                                String toUser_id = doc.getDocument().getId();
+
+                                BlogPost blogPost = doc.getDocument().toObject(BlogPost.class).withId(toUser_id);
                                 blog_list.add(blogPost);
 
                                 blogRecyclerAdapter.notifyDataSetChanged();
@@ -162,5 +175,10 @@ public class HomeFragment extends Fragment {
 
         }
     }
+
+
+
+
+
 
 }

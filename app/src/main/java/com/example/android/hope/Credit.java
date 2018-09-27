@@ -1,5 +1,6 @@
 package com.example.android.hope;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +15,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +32,9 @@ public class Credit extends AppCompatActivity {
     private String name1, cost1, cardn, cv, date;
     private FirebaseAuth mAuth;
     private FirebaseFirestore firebaseFirestore;
+    public int  counter ;
+    public int counterInter;
+    public String counterString ;
 
     Button btn;
 
@@ -52,7 +61,7 @@ public class Credit extends AppCompatActivity {
         tv = new CreditCardFormatTextWatcher(cardnumber);
         cardnumber.addTextChangedListener(tv);
 
-        // to make format for Expiry Date
+        // to make format for Expiry Date0
         expiry.addTextChangedListener(mDateEntryWatcher);
 
 
@@ -73,50 +82,124 @@ public class Credit extends AppCompatActivity {
         cv = cvv.getText().toString().trim();
         date = expiry.getText().toString().trim();
 
-        String user_id = mAuth.getCurrentUser().getUid();
+        if (validate()) {
 
-        Map<String, Object> donationMap = new HashMap<>();
-        donationMap.put("amount", cost1);
-        donationMap.put("card_name", name1);
-        donationMap.put("card_number", cardn);
-        donationMap.put("cvv", cv);
-        donationMap.put("expiry", date);
+            final String user_id = mAuth.getCurrentUser().getUid();
 
-        firebaseFirestore.collection("DonationData").document(user_id).set(donationMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
+            Intent intent = getIntent();
+            final String toUserId = intent.getStringExtra("toUserId");
 
-                if(task.isSuccessful()){
+            firebaseFirestore.collection("posts").document(toUserId).update("donate_id", user_id);
+            firebaseFirestore.collection("posts").document(toUserId).update("donate_timestamp", FieldValue.serverTimestamp());
 
-                    if (validate()) {
 
-                        Toast.makeText(Credit.this, "you have donated successfully", Toast.LENGTH_LONG).show();
 
-                        finish();
 
-            /*Intent backIntent = new Intent(getApplicationContext(), BlogRecyclerAdapter.class);
-            //TO pass data to another intent (activity)
-            backIntent.putExtra("message","  Taken  ");
+            String string_to_be_converted_to_MD5 = cardn;
+            String MD5_Hash_String = md5(string_to_be_converted_to_MD5);
+            //System.out.println(MD5_Hash_String);
 
-            //To Pass data to another intent (activity)
+            Map<String, Object> donationMap = new HashMap<>();
+            donationMap.put("amount", cost1);
+            donationMap.put("card_name", name1);
+            donationMap.put("card_number", MD5_Hash_String);
+            donationMap.put("cvv", cv);
+            donationMap.put("expiry", date);
+            donationMap.put("user_id", user_id);
 
-            backIntent.putExtra("state", "success");
-            startActivity(backIntent);*/
+            firebaseFirestore.collection("DonationData").add(donationMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentReference> task) {
+
+
+                    if (task.isSuccessful()) {
+
+
+                firebaseFirestore.collection("posts").document(toUserId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                        if(task.isSuccessful())
+
+                        {
+                            Map<String, Object> notificationMap = new HashMap<>();
+                            notificationMap.put("amount", cost1);
+                            notificationMap.put("from", user_id);
+
+                            String postUserID = task.getResult().getString("user_id");
+                            firebaseFirestore.collection("Users/" + postUserID + "/Notifications").add(notificationMap);
+                        }
+
                     }
-                    else
-                        Toast.makeText(Credit.this, "Failed", Toast.LENGTH_SHORT).show();
+                }) ;
 
-                }else{
 
-                    String error = task.getException().getMessage();
-                    Toast.makeText(Credit.this, "Error :" + error, Toast.LENGTH_LONG).show();
+
+                        /*firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful()){
+
+                                    String namefrom = task.getResult().getString("name");
+
+                                    Intent intent = getIntent();
+                                    String toUserId = intent.getStringExtra("toUserId");
+
+                                    Map<String, Object> notificationMap = new HashMap<>();
+                                    notificationMap.put("name", namefrom);
+
+
+
+                                    firebaseFirestore.collection("Notifications").document(toUserId).collection("/notification1").document(user_id).update(notificationMap);
+
+                                }
+                            }
+                        });*/
+                                increaseCounter();
+                                Intent sendIntent = new Intent(Credit.this, SendActivity.class);
+                                startActivity(sendIntent);
+
+                                finish();
+
+
+
+                    } else {
+
+                        String error = task.getException().getMessage();
+                        Toast.makeText(Credit.this, "Error :" + error, Toast.LENGTH_LONG).show();
+                    }
                 }
-            }
-        });
+
+            });
+
+        }else{
+            Toast.makeText(Credit.this, "Failed", Toast.LENGTH_SHORT).show();
+
+            }//this one
+
 
 
     }
 
+    private String md5(String string_to_be_converted_to_md5) {
+
+        try {
+            // Create MD5 Hash
+            MessageDigest digest = java.security.MessageDigest.getInstance("MD5");
+            digest.update(string_to_be_converted_to_md5.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            for (int i=0; i<messageDigest.length; i++)
+                hexString.append(Integer.toHexString(0xFF & messageDigest[i]));
+
+            return hexString.toString();
+        }catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
 
     // to make conditions to check the entered data
@@ -147,6 +230,42 @@ public class Credit extends AppCompatActivity {
         }
 
         return valid;
+
+    }
+
+    private void increaseCounter() {
+
+        String current_user = mAuth.getCurrentUser().getUid() ;
+        firebaseFirestore.collection("donationCounter").document(current_user).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+
+                String counterDatebase = task.getResult().getString("counter");
+                counter = Integer.parseInt(counterDatebase);
+                counterInter = counter + 1 ;
+                counterString = String.valueOf(counterInter) ;
+
+                addToDate(counterString);
+
+            }
+        });
+    }
+
+    private void addToDate(String counterString) {
+        String current_user = mAuth.getCurrentUser().getUid() ;
+        Map<String,Object> donationMap = new HashMap<>();
+        donationMap.put("counter",counterString);
+        firebaseFirestore.collection("donationCounter").document(current_user).set(donationMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(task.isSuccessful()){
+                    Toast.makeText(Credit.this, "counter was increase", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
 
     }
 
@@ -193,7 +312,3 @@ public class Credit extends AppCompatActivity {
     };
 
 }
-
-
-
-

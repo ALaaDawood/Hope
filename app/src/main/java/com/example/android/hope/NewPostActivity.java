@@ -152,6 +152,10 @@ public class NewPostActivity extends AppCompatActivity {
                                             postMap.put("desc", desc);
                                             postMap.put("user_id", current_user_id);
                                             postMap.put("timestamp", FieldValue.serverTimestamp());
+                                            postMap.put("donate_id","empty");
+                                            postMap.put("city","ismailia");
+                                            postMap.put("govern","Egypt");
+                                            postMap.put("donate_timestamp","empty");
 
 
                                             firebaseFirestore.collection("posts").add(postMap).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {

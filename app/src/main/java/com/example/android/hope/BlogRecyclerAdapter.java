@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -14,13 +17,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -35,8 +39,10 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
     public Context context;
     public FirebaseFirestore firebaseFirestore;
     public Dialog myDialog ;
-    public Button donateButton;
-    public TextView markTaken;
+    private FirebaseAuth firebaseAuth;
+    private android.support.v4.app.Fragment showNeederAccount  ;
+    private FragmentActivity myContext;
+
 
 
     public BlogRecyclerAdapter(List<BlogPost> blog_list){
@@ -55,8 +61,10 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         final ViewHolder vHolder =new ViewHolder(view);
         context = parent.getContext();
         firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
 
-        donateButton = view.findViewById(R.id.donate_button);
+        showNeederAccount = new ShowNeederAccount() ;
+
 
         myDialog = new Dialog(parent.getContext());
         myDialog.setContentView(R.layout.dialog_contact);
@@ -70,8 +78,10 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
                 final TextView dialog_name_tv = (TextView) myDialog.findViewById(R.id.dialog_name);
                 final TextView dialog_phone_tv = (TextView) myDialog.findViewById(R.id.dialog_phone);
-                final ImageView dialog_image_tv = (ImageView) myDialog.findViewById(R.id.dialog_image);
-                String contact_id =blog_list.get(vHolder.getAdapterPosition()).getUser_id() ;
+                final CircleImageView dialog_image_tv = (CircleImageView) myDialog.findViewById(R.id.dialog_image);
+                final TextView dialog_location = (TextView) myDialog.findViewById(R.id.dialog_location) ;
+                final  Button viewProfile = (Button) myDialog.findViewById(R.id.viewProfile);
+                final String contact_id =blog_list.get(vHolder.getAdapterPosition()).getUser_id() ;
 
 
                 firebaseFirestore.collection("Users").document(contact_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -96,8 +106,37 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
                     }
                 });
+               /* firebaseFirestore.collection("Location").document(contact_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            String city = task.getResult().getString("city") ;
+                            String govern = task.getResult().getString("govern") ;
+                            dialog_location.setText(city + "," +govern);
+                        }
 
-                Toast.makeText(parent.getContext(),"test click"+String.valueOf(vHolder.getAdapterPosition()),Toast.LENGTH_SHORT).show();
+                    }
+                }); */
+                viewProfile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        myDialog.hide();
+
+                        Bundle bundle = new Bundle();
+                        bundle.putString("NAME_KEY",contact_id);
+                        //PASS OVER THE BUNDLE TO OUR FRAGMENT
+                        ShowNeederAccount myFragment = new ShowNeederAccount();
+                        myFragment.setArguments(bundle);
+                        sendToNeederProfile(myFragment) ;
+
+
+
+
+
+
+                    }
+                });
+                //Toast.makeText(parent.getContext(),"test click"+String.valueOf(vHolder.getAdapterPosition()),Toast.LENGTH_SHORT).show();
                 myDialog.show();
             }
         });
@@ -106,8 +145,38 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         return vHolder;
     }
 
+    private void sendData(String contact_id) {
+
+        Bundle bundle = new Bundle();
+        bundle.putString("NAME_KEY",contact_id);
+        //PASS OVER THE BUNDLE TO OUR FRAGMENT
+        ShowNeederAccount myFragment = new ShowNeederAccount();
+        myFragment.setArguments(bundle);
+
+    }
+
+    private void sendToNeederProfile(android.support.v4.app.Fragment fragment) {
+        FragmentTransaction fragmentTransaction = ((FragmentActivity)context).getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.main_container, fragment);
+        fragmentTransaction.commit();
+    }
+
+    private void replaceFragment(donorProfileFragment donorProfileFragment) {
+
+     /*   FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.main_container, donorProfileFragment);
+        fragmentTransaction.commit();*/
+
+    }
+
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+
+        final String toUserId = blog_list.get(position).ToUserID;
+        final String currentUserId = firebaseAuth.getCurrentUser().getUid();
+
+        /*String donate_id = blog_list.get(position).getDonate_id() ;
+        holder.hideCard(donate_id); */
 
         String desc_data = blog_list.get(position).getDesc();
         holder.setDescText(desc_data);
@@ -118,52 +187,12 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         final String user_id = blog_list.get(position).getUser_id();
 
-        donateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        final  String donate_id  = blog_list.get(position).getDonate_id();
+        if(!donate_id.equals("empty"))
+        {
+            holder.hideCard();
+        }
 
-                Intent creditIntent = new Intent(context, Credit.class);
-                //String message = creditIntent.getStringExtra("message");
-                boolean check = creditIntent.hasExtra("state");
-                context.startActivity(creditIntent);
-
-               // markTaken.setText(message);
-
-
-                if(check){
-                    // IF the user donates successfully , make Donate button enabled False
-                    if (creditIntent.getStringExtra("state").equals("success")){
-                        donateButton.setEnabled(false);
-                    }else{
-                        donateButton.setEnabled(true);
-                    }
-                }
-                else{
-                    donateButton.setEnabled(true);
-                }
-
-               // message = creditIntent.getStringExtra("message");
-                check = creditIntent.hasExtra("state");
-
-                // To set Taken in Doante's textView
-                //markTaken = mView.findViewById(R.id.mark_post_taken);
-                //markTaken.setText(message);
-
-            }
-
-        });
-
-
-        /*donateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent sendIntent = new Intent(context, SendActivity.class);
-                sendIntent.putExtra("user_id", user_id);
-                context.startActivity(sendIntent);
-
-            }
-        });*/
         //retreive name and image of the user...
         firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -186,7 +215,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
         });
         ////////////////////////////////////////////////////////////////
 
-        firebaseFirestore.collection("Location").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+       /* firebaseFirestore.collection("Location").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
@@ -203,36 +232,57 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
                     //Firebase Exception
                 }
             }
-        });
+        });*/
+
+       String city = blog_list.get(position).getCity() ;
+       String governrate = blog_list.get(position).getGovern() ;
+       holder.setUserLocate(city,governrate);
 
 
         long millisecond = blog_list.get(position).getTimestamp().getTime();
         String dateString = DateFormat.format("dd/MM/yyyy", new Date(millisecond)).toString();
         holder.setTime(dateString);
 
+        holder.donateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent creditIntent = new Intent(context, Credit.class);
+                creditIntent.putExtra("toUserId",  toUserId );
+                context.startActivity(creditIntent);
+
+            }
+        });
 
     }
+
+
 
     @Override
     public int getItemCount() {
         return blog_list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
 
         private View mView;
-        private CardView item_contact ;
+        public CardView item_contact ;
         private TextView descView;
         private ImageView blogImageView;
         private TextView blogDate;
         private CircleImageView blogUserImage;
         private TextView blogUserName;
         private TextView userLocation;
+        public Button donateButton;
+        public  CardView main_blog_post ;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mView = itemView;
             item_contact = (CardView)itemView.findViewById(R.id.main_blog_post);
+            donateButton = mView.findViewById(R.id.donate_button);
 
         }
 
@@ -263,12 +313,13 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             blogDate.setText(date);
         }
         //هنا هضيف براميتر للوكيشن برضه
-        public void setUserData(String name, String image){
+        public void setUserData(final String name, String image){
 
             blogUserImage = mView.findViewById(R.id.blog_user_image);
             blogUserName = mView.findViewById(R.id.blog_user_name);
 
             blogUserName.setText(name);
+            
 
             RequestOptions placeholderOptions = new RequestOptions();
             placeholderOptions.placeholder(R.drawable.profile_placeholder);
@@ -284,6 +335,20 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
             userLocation.setText(city + ", " + govern);
 
 
+        }
+        public  void hideCard()
+        {
+
+            //itemView.setVisibility((!donate_id.equals("empty")) ? View.INVISIBLE : View.VISIBLE);
+            //itemView.setLayoutParams(new RelativeLayout.LayoutParams(20, 20));
+           /* RecyclerView.LayoutParams layoutParams = (RecyclerView.LayoutParams) itemView.getLayoutParams();
+            layoutParams.setMargins(0, 0, 0, 0);
+            itemView.setLayoutParams(layoutParams);
+//            notifyDataSetChanged();*/
+            itemView.setVisibility(View.GONE) ;
+            itemView.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
+//            notifyDataSetChanged();
+            //itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
         }
 
     }

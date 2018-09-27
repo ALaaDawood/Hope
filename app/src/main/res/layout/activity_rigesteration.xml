@@ -29,21 +29,11 @@
             android:layout_marginTop="10dp"/>
 
 
-        <EditText
-            android:id="@+id/nameET"
-            android:layout_width="300dp"
-            android:layout_marginTop="16dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:layout_gravity="center"
-            android:hint="your name"
-            android:textColor="@color/colorPrimaryDark"
-            android:textStyle="bold"/>
 
         <EditText
             android:id="@+id/emailET"
             android:layout_width="300dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:hint="your Email"
@@ -75,15 +65,7 @@
             android:textColor="@color/colorPrimaryDark"
             android:textStyle="bold"/>
 
-        <Spinner
-             android:id="@+id/roleSpinner"
-             android:layout_width="300dp"
-             android:layout_marginTop="10dp"
-             android:layout_height="wrap_content"
-             android:layout_gravity="center"
-             android:textColor="@color/colorPrimaryDark">
 
-         </Spinner>
 
         <Button
             android:id="@+id/btnsu"
@@ -91,6 +73,7 @@
             android:layout_height="wrap_content"
             android:text="SIGN UP"
             android:layout_gravity="center"
+            android:layout_marginTop="25dp"
             android:textColor="@color/colorAccent"
             android:background="@color/colorPrimary"
             android:textStyle="bold"/>
@@ -109,6 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="SIGN IN "
+            android:layout_marginTop="10dp"
             android:textColor="@color/colorAccent"/>
 
 

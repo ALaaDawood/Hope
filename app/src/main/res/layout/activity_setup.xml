@@ -8,76 +8,77 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".setup">
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/setupToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/colorPrimary">
+            android:background="@color/colorAccent"
+            app:titleTextColor="@color/colorPrimary"></android.support.v7.widget.Toolbar>
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/setupToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorAccent"
-                app:titleTextColor="@color/colorPrimary"></android.support.v7.widget.Toolbar>
+        <ProgressBar
+            android:id="@+id/setup_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:indeterminate="true"
+            android:visibility="invisible" />
 
-            <ProgressBar
-                android:id="@+id/setup_progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:visibility="invisible"
-                android:layout_marginTop="5dp"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/setup_image"
+            android:layout_width="match_parent"
+            android:layout_height="185dp"
+            android:layout_gravity="center"
+            android:layout_margin="40dp"
+            android:src="@drawable/profilesetup" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/setup_image"
-                android:layout_width="match_parent"
-                android:layout_height="185dp"
-                android:layout_gravity="center"
-                android:layout_margin="40dp"
-                android:src="@drawable/profilesetup" />
+        <EditText
+            android:id="@+id/setup_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:ems="10"
+            android:hint="Name"
+            android:inputType="textPersonName"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/setup_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:ems="10"
-                android:hint="Name"
-                android:inputType="textPersonName"
-                android:textColor="@color/colorPrimaryDark"
-                android:textStyle="bold" />
+        <EditText
+            android:id="@+id/setup_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:ems="10"
+            android:maxLength="11"
+            android:inputType="number"
+            android:hint="@string/phone_number_setup"
+            android:textColor="@color/colorPrimaryDark"
+            android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/setup_phone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:ems="10"
-                android:hint="@string/phone_number_setup"
-                android:inputType="textPersonName|phone"
-                android:textColor="@color/colorPrimaryDark"
-                android:textStyle="bold" />
+        <Spinner
+            android:id="@+id/role_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/colorPrimaryDark" />
 
-            <Spinner
-                android:id="@+id/role_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="20dp"
-                android:textColor="@color/colorPrimaryDark" />
+        <Button
+            android:id="@+id/setup_btn"
+            android:layout_width="match_parent"
+            android:layout_height="43dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/colorPrimaryDark"
+            android:text="save account setting "
+            android:textAllCaps="false"
+            android:textColor="@color/colorPrimary" />
 
-            <Button
-                android:id="@+id/setup_btn"
-                android:layout_width="match_parent"
-                android:layout_height="43dp"
-                android:background="@color/colorPrimaryDark"
-                android:text="save account setting "
-                android:textAllCaps="false"
-                android:textColor="@color/colorPrimary"
-                android:layout_marginBottom="20dp"/>
-
-        </LinearLayout>
+    </LinearLayout>
     </ScrollView>

@@ -23,11 +23,14 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -109,10 +112,48 @@ public class Login extends AppCompatActivity {
 
                     mAuth.signInWithEmailAndPassword(loginEmail, loginPass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
+                        public void onComplete(@NonNull final Task<AuthResult> task) {
 
                             if(task.isSuccessful()){
-                                sendToHome();
+
+
+                                String token_id = FirebaseInstanceId.getInstance().getToken();
+                                final String current_id = mAuth.getCurrentUser().getUid();
+
+                                Map<String, Object> tokenMap = new HashMap<>();
+                                tokenMap.put("token_id", token_id);
+
+                                firebaseFirestore.collection("Users").document(current_id).update(tokenMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                       firebaseFirestore.collection("Users").document(current_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                           @Override
+                                           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                                               if(task.isSuccessful())
+                                               {
+                                                   String Role = task.getResult().getString("role");
+                                                   if(Role.equals("Needer"))
+                                                   {
+                                                       sendToHome();
+                                                   }
+                                                   else
+                                                   {
+                                                        sendToDonorHome();
+                                                   }
+                                               }
+
+                                           }
+                                       });
+
+
+                                    }
+                                });
+
+
+
+
+
 
                             } else{
 
@@ -139,17 +180,11 @@ public class Login extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //check user logged in
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser!=null){
-            sendToHome();
-        }
+        sendToHome();
     }
 
     private void sendToHome() {
-        Intent homeIntent = new Intent(Login.this, HomeActivity.class);
-        startActivity(homeIntent);
-        finish();
+
 
         locationListener = new LocationListener() {
 
@@ -205,6 +240,7 @@ public class Login extends AppCompatActivity {
 
             }
 
+
             @Override
             public void onStatusChanged(String s, int i, Bundle bundle) {
 
@@ -242,8 +278,123 @@ public class Login extends AppCompatActivity {
             }
         };
         configurelocation();
+        //check user logged in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser!=null) {
+
+
+                            Intent homeIntent = new Intent(Login.this, HomeActivity.class);
+                            startActivity(homeIntent);
+                            finish();
+
+
+
+
+
+        }
     }
 
+
+    private void sendToDonorHome() {
+
+
+        locationListener = new LocationListener() {
+
+            //it called when location is updated , changed (هى دى ال فانكشن اللى بتطلع النتيجة فى الاخر)
+            @Override
+            public void onLocationChanged(Location location) {
+
+                // احداثيات الطول والعرض بتاعة الموقع ، دول اللى المفروض نخزنهم فى الداتا بيز بتاعة ال سين ان وال بوستات
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+
+                try {
+
+                    // هنا بجيب بقى العنوان اللى بتدل عليه الاحداثيات دى ، انا هنا سبتهم ليكى زيادة عشان لو عايزاهم ولا حاجة
+                    addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                    String address = addresses.get(0).getAddressLine(0); // عشان اجيب العنوان كلها
+                    String city = addresses.get(0).getLocality(); // الشارع
+                    String govern = addresses.get(0).getAdminArea(); // المدينة
+                    String country = addresses.get(0).getCountryName(); //البلد
+
+
+                    String user_id = mAuth.getCurrentUser().getUid();
+
+                    Map<String, Object> locationMap = new HashMap<>();
+                    locationMap.put("city", city);
+                    locationMap.put("govern", govern);
+                    locationMap.put("address", address);
+
+
+                    firebaseFirestore.collection("Location").document(user_id).set(locationMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+
+                            if(task.isSuccessful()){
+
+                                Toast.makeText(Login.this, "The location updated", Toast.LENGTH_LONG).show();
+
+                            }else{
+
+                                String error = task.getException().getMessage();
+                                Toast.makeText(Login.this, "Error :" + error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+
+            }
+
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            //checks if network provider is turned off , if turned off go to settings to turn on
+            @Override
+            public void onProviderDisabled(String s) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(Login.this); //هى المشكلة فى الحتة دى
+
+                alertDialog.setTitle("Network" + " SETTINGS");
+
+                alertDialog.setMessage("Network" + " is not enabled! Want to go to settings menu?");
+
+                alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
+
+                alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                alertDialog.create().show();
+
+            }
+        };
+        configurelocation();
+
+        Intent homeIntent = new Intent(Login.this, HomeDonorActivity.class);
+        startActivity(homeIntent);
+        finish();
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {

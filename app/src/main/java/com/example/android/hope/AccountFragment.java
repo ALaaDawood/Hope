@@ -2,7 +2,10 @@ package com.example.android.hope;
 
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +15,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -28,23 +35,25 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AccountFragment extends Fragment {
+public class AccountFragment extends  Fragment {
 
     private  ImageView Profile_Image ;
     private  TextView Profile_Name  ;
-    private  TextView Profile_Email ;
     private  TextView Profile_Phone ;
     public   Context context;
     private  FirebaseAuth mAuth ;
     private  FirebaseFirestore firebaseFirestore ;
 
 
-    private RecyclerView blog_list_view;
-    private List<BlogPost> blog_list;
-    private ProfileRecyclerAdapter profileRecyclerAdapter;
+
 
     private DocumentSnapshot lastVisible;
     private Boolean isFirstPageFirstLoad = true;
+    private RecyclerView account_list_view ;
+    private List<AccountPost> account_list ;
+    private AccountRecyclerAdapter accountRecyclerAdapter ;
+
+
 
 
 
@@ -63,55 +72,65 @@ public class AccountFragment extends Fragment {
 
 
         mAuth=FirebaseAuth.getInstance();
+        firebaseFirestore = firebaseFirestore.getInstance() ;
         String current_user = mAuth.getCurrentUser().getUid() ;
 
-        Profile_Name = (TextView) view.findViewById(R.id.needer_name);
-        Profile_Email = (TextView) view.findViewById(R.id.needer_mail);
-        Profile_Phone = (TextView) view.findViewById(R.id.needer_phone);
-        Profile_Image = (ImageView) view.findViewById(R.id.needer_img);
+        Profile_Name = view.findViewById(R.id.donorName);
+        Profile_Phone = view.findViewById(R.id.donorPhone);
+        Profile_Image = view.findViewById(R.id.donorImg);
 
-/*
+
+        account_list = new ArrayList<>() ;
+        account_list_view = view.findViewById(R.id.account_list_view);
+        accountRecyclerAdapter = new AccountRecyclerAdapter(account_list);
+        account_list_view.setLayoutManager(new LinearLayoutManager(container.getContext()));
+        account_list_view.setAdapter(accountRecyclerAdapter);
+        account_list_view.setHasFixedSize(true);
+
+
+
+/**************************************************************************************************/
+
+
         firebaseFirestore.collection("Users").document(current_user).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
-                if (task.isSuccessful()) {
+                if(task.isSuccessful()){
 
-                    String name  = task.getResult().getString("name");
-                    String mail  = task.getResult().getString("role");
-                    String phone = task.getResult().getString("phone");
-                    String image = task.getResult().getString("image");
+                    String Name = task.getResult().getString("name") ;
+                    String Phone = task.getResult().getString("phone");
+                    String Image = task.getResult().getString("image");
+                    Profile_Name.setText(Name);
+                    Profile_Phone.setText(Phone);
+
+                    // mainImageURI = Uri.parse(Image);
 
 
-                    Profile_Name.setText(name);
-                    Profile_Email.setText(mail);
-                    Profile_Phone.setText(phone);
                     RequestOptions placeholderOptions = new RequestOptions();
                     placeholderOptions.placeholder(R.drawable.profile_placeholder);
-                    Glide.with(context.getApplicationContext()).applyDefaultRequestOptions(placeholderOptions).load(image).into(Profile_Image);
+
+                    Glide.with(AccountFragment.this).applyDefaultRequestOptions(placeholderOptions).load(Image).into(Profile_Image);
+
+
 
                 }
             }
-        });*/
+        });
+
+
+
+/***************************************************************************************/
 
 
 
 
-        blog_list = new ArrayList<>();
-        blog_list_view = view.findViewById(R.id.blog_list_view);
+        if(mAuth.getCurrentUser() != null)
 
-
-
-
-        profileRecyclerAdapter = new ProfileRecyclerAdapter(blog_list);
-        blog_list_view.setLayoutManager(new LinearLayoutManager(getActivity()));
-        blog_list_view.setAdapter(profileRecyclerAdapter);
-        blog_list_view.setHasFixedSize(true);
-
-        if(mAuth.getCurrentUser() != null) {
+        {
             firebaseFirestore = FirebaseFirestore.getInstance();
-
-            blog_list_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            account_list_view.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @RequiresApi(api = Build.VERSION_CODES.ICE_CREAM_SANDWICH)
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
@@ -125,17 +144,19 @@ public class AccountFragment extends Fragment {
                 }
             });
 
-            if (mAuth.getCurrentUser()!=null) {
-                firebaseFirestore = FirebaseFirestore.getInstance();
+            if(mAuth.getCurrentUser() != null){
 
-                Query firstQuery = firebaseFirestore.collection("posts").whereEqualTo("user_id",current_user).orderBy("timestamp", Query.Direction.DESCENDING).limit(3);
-                //limit ?? ???? ??? ???? ?????? ???? ???? ????? ???? 5 ??
 
+                final Query firstQuery = firebaseFirestore.collection("posts")
+                        .whereEqualTo("user_id",current_user)
+                        .orderBy("timestamp", Query.Direction.DESCENDING)
+                        .limit(3);
                 firstQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
 
-                        if (!documentSnapshots.isEmpty()) {
+                        if ( documentSnapshots != null ) {
+                            //account_list.clear();
                             if (isFirstPageFirstLoad) {
 
                                 lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
@@ -145,15 +166,15 @@ public class AccountFragment extends Fragment {
 
                                 if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                    BlogPost blogPost = doc.getDocument().toObject(BlogPost.class);
+                                    AccountPost accountPost = doc.getDocument().toObject(AccountPost.class);
                                     if (isFirstPageFirstLoad) {
 
-                                        blog_list.add(blogPost);
+                                        account_list.add(accountPost);
                                     } else {
-                                        blog_list.add(0, blogPost);
+                                        account_list.add(0, accountPost);
                                     }
 
-                                    profileRecyclerAdapter.notifyDataSetChanged();
+                                    accountRecyclerAdapter.notifyDataSetChanged();
 
                                 }
 
@@ -163,8 +184,12 @@ public class AccountFragment extends Fragment {
                     }
                 });
 
+
             }
         }
+
+
+
 
 
         // Inflate the layout for this fragment
@@ -185,13 +210,13 @@ public class AccountFragment extends Fragment {
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .startAfter(lastVisible)
                     .limit(3);
-            //limit ?? ???? ??? ???? ?????? ???? ???? ????? ???? 5 ??
+            //limit دى يعني انا بقول الصفحه اكتر حاجه تتحمل فيها 5 بس
 
             nextQuery.addSnapshotListener(getActivity(), new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
 
-                    if (!documentSnapshots.isEmpty()) {
+                    if (documentSnapshots != null) {
 
 
                         lastVisible = documentSnapshots.getDocuments().get(documentSnapshots.size() - 1);
@@ -200,10 +225,10 @@ public class AccountFragment extends Fragment {
 
                             if (doc.getType() == DocumentChange.Type.ADDED) {
 
-                                BlogPost blogPost = doc.getDocument().toObject(BlogPost.class);
-                                blog_list.add(blogPost);
+                                AccountPost accountPost = doc.getDocument().toObject(AccountPost.class);
+                                account_list.add(accountPost);
 
-                                profileRecyclerAdapter.notifyDataSetChanged();
+                                accountRecyclerAdapter.notifyDataSetChanged();
 
                             }
 
@@ -214,6 +239,8 @@ public class AccountFragment extends Fragment {
 
         }
     }
+
+
 
 
 }

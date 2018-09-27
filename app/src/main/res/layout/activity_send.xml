@@ -1,17 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SendActivity">
+    android:background="@drawable/background"
+    tools:context=".SendActivity"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/user_id_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="54dp"
-        android:text="TextView" />
-</RelativeLayout>
+    <LinearLayout
+        android:id="@+id/l1"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/userLine"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="398dp"
+            android:layout_height="wrap_content"
+            android:text="Congratulations on your Donation Number"
+            android:textAlignment="center"
+            android:layout_gravity="center"
+            android:layout_marginTop="150dp"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/userCounter"
+            android:textColor="@color/colorPrimary"
+            android:layout_width="398dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:textSize="50sp"
+            android:layout_marginTop="20dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/l2"
+        android:layout_width="match_parent"
+        android:layout_height="237dp"
+        android:background="@drawable/spaceullustration"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/goHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/buttonstyle"
+            android:text="Go To Home"
+            android:textColor="#8c8c8c" />
+    </LinearLayout>
+
+
+
+</LinearLayout>

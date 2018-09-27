@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -44,9 +45,7 @@ public class setup extends AppCompatActivity {
     private  Uri mainImageURI = null;
     private EditText setupName ;
     private EditText setupPhone;
-    //private  EditText setOldPass  ;
-    //private EditText setNewPass ;
-    //private EditText setConfirmPass ;
+
     private Button setupBtn ;
     private Spinner roleSpinner;
     private String user_id;
@@ -86,9 +85,7 @@ public class setup extends AppCompatActivity {
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
-        /*setOldPass =  findViewById(R.id.setup_old_password) ;
-        setNewPass =  findViewById(R.id.setup_new_password);
-        setConfirmPass = findViewById(R.id.setup_confirm_password) ; */
+
         setupBtn   =   findViewById(R.id.setup_btn) ;
         setupProgress = findViewById(R.id.setup_progress);
 
@@ -139,9 +136,12 @@ public class setup extends AppCompatActivity {
         setupBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 final String user_name = setupName.getText().toString();
                 final String user_phone = setupPhone.getText().toString();
                 final String role = roleSpinner.getSelectedItem().toString();
+
+
 
                 if (!TextUtils.isEmpty(user_name) && !TextUtils.isEmpty(role) && !TextUtils.isEmpty(user_phone) && mainImageURI != null) {
                 setupProgress.setVisibility(View.VISIBLE);
@@ -204,9 +204,9 @@ public class setup extends AppCompatActivity {
 
     }
 
-    private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, String user_name, String user_phone, String role) {
+    private void storeFirestore(@NonNull Task<UploadTask.TaskSnapshot> task, final String user_name, final String user_phone, final String role) {
 
-        Uri download_uri;
+       final Uri download_uri;
         if(task!=null) {
 
 
@@ -215,31 +215,75 @@ public class setup extends AppCompatActivity {
 
              download_uri = mainImageURI;
         }
-        Map<String, String> userMap = new HashMap<>();
-        userMap.put("name", user_name);
-        userMap.put("image", download_uri.toString());
-        userMap.put("phone", user_phone);
-        userMap.put("role", role);
 
-        firebaseFirestore.collection("Users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
 
-                if(task.isSuccessful()){
+            String token_id = FirebaseInstanceId.getInstance().getToken();
+            Map<String, String> userMap = new HashMap<>();
+            userMap.put("name", user_name);
+            userMap.put("image", download_uri.toString());
+            userMap.put("phone", user_phone);
+            userMap.put("role", role);
+            userMap.put("token_id", token_id);
 
-                    Toast.makeText(setup.this, "The user settings are updated", Toast.LENGTH_LONG).show();
-                    Intent mainIntent = new Intent(setup.this,HomeActivity.class);
-                    startActivity(mainIntent);
-                    finish();
+            firebaseFirestore.collection("Users").document(user_id).set(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
 
-                }else{
+                    if(task.isSuccessful()){
 
-                    String error = task.getException().getMessage();
-                    Toast.makeText(setup.this, "FireStore Error :" + error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(setup.this, "The user settings are updated", Toast.LENGTH_LONG).show();
+                        firebaseFirestore.collection("Users").document(user_id).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if(task.isSuccessful())
+                                {
+                                    String Role = task.getResult().getString("role") ;
+                                    if(Role.equals("Donor"))
+                                    {
+                                        Toast.makeText(setup.this, "The Donor Home", Toast.LENGTH_LONG).show();
+                                        Intent mainIntent = new Intent(setup.this,HomeDonorActivity.class);
+                                        startActivity(mainIntent);
+                                        finish();
+                                    }
+                                    else{
+                                        String Current = firebaseAuth.getCurrentUser().getUid() ;
+                                        firebaseFirestore.collection("Users").document(Current).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if(task.isSuccessful())
+                                                {
+                                                    String Role = task.getResult().getString("role");
+                                                    if(Role.equals("Donor"))
+                                                    {
+                                                        Intent mainIntent = new Intent(setup.this,HomeDonorActivity.class);
+                                                        startActivity(mainIntent);
+                                                        finish();
+                                                    }
+                                                    else
+                                                    {
+                                                        Intent mainIntent = new Intent(setup.this,HomeActivity.class);
+                                                        startActivity(mainIntent);
+                                                        finish();
+                                                    }
+                                                }
+                                            }
+                                        });
+
+                                    }
+                                }
+                            }
+                        });
+
+
+                    }else{
+
+                        String error = task.getException().getMessage();
+                        Toast.makeText(setup.this, "FireStore Error :" + error, Toast.LENGTH_LONG).show();
+                    }
+                    setupProgress.setVisibility(View.INVISIBLE);
                 }
-                setupProgress.setVisibility(View.INVISIBLE);
-            }
-        });
+            });
+
     }
 
     private void BringImagePicker() {

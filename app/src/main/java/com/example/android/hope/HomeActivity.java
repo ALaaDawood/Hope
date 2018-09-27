@@ -1,5 +1,7 @@
 package com.example.android.hope;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,11 +17,16 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -34,6 +41,8 @@ public class HomeActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private NotificationFragment notificationFragment;
     private AccountFragment accountFragment;
+    private NeederFragment neederFragment ;
+    private donorProfileFragment donorProfile ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +54,11 @@ public class HomeActivity extends AppCompatActivity {
 
         mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
-
         getSupportActionBar().setTitle("Hope Book");
 
         if(mAuth.getCurrentUser() != null) {
+
+
 
             mainBottomNav = findViewById(R.id.mainBottomNav);
 
@@ -56,9 +66,11 @@ public class HomeActivity extends AppCompatActivity {
             homeFragment = new HomeFragment();
             notificationFragment = new NotificationFragment();
             accountFragment = new AccountFragment();
+            neederFragment = new NeederFragment() ;
+            donorProfile = new donorProfileFragment() ;
 
-            replaceFragment(homeFragment);
 
+            replaceFragment(neederFragment);
             mainBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -66,7 +78,7 @@ public class HomeActivity extends AppCompatActivity {
                     switch (item.getItemId()) {
 
                         case R.id.bottom_action_home:
-                            replaceFragment(homeFragment);
+                            replaceFragment(neederFragment);
                             return true;
 
                         case R.id.bottom_action_notif:
@@ -74,6 +86,7 @@ public class HomeActivity extends AppCompatActivity {
                             return true;
 
                         case R.id.bottom_action_account:
+
                             replaceFragment(accountFragment);
                             return true;
 
@@ -121,6 +134,11 @@ public class HomeActivity extends AppCompatActivity {
 
                         if(!task.getResult().exists()){
 
+                            String current_user = mAuth.getCurrentUser().getUid();
+                            Map<String,Object> counterMap = new HashMap<>();
+                            counterMap.put("counter", "1");
+                            firebaseFirestore.collection("donationCounter").document(current_user).set(counterMap);
+
                             Intent setupIntent = new Intent(HomeActivity.this, setup.class);
                             startActivity(setupIntent);
                             finish();
@@ -152,12 +170,31 @@ public class HomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch ((item.getItemId())){
             case R.id.action_logout_btn:
-                logOut();
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this); //هى المشكلة فى الحتة دى
+
+                alertDialog.setTitle("LogOut");
+
+                alertDialog.setMessage("Are you sure you want to LogOut?");
+
+                alertDialog.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                    }
+                });
+
+                alertDialog.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       logOut();
+                    }
+                });
+
+                alertDialog.create().show();
                 return true;
 
             case R.id.action_settings_btn:
 
-                Intent settingsIntent = new Intent(HomeActivity.this, setup.class);
+                Intent settingsIntent = new Intent(HomeActivity.this, SetupNormal.class);
                 startActivity(settingsIntent);
 
                 return true;
@@ -169,8 +206,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void logOut() {
 
-        mAuth.signOut();
-        sendToLogin();
+        Map<String, Object> tokenMapRemove = new HashMap<>();
+        tokenMapRemove.put("token_id", FieldValue.delete());
+        firebaseFirestore.collection("Users").document(current_user_id).update(tokenMapRemove).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                mAuth.signOut();
+                sendToLogin();
+
+            }
+        });
+
 
     }
 

@@ -7,6 +7,7 @@
     <string name="bottom_home_text">Home</string>
     <string name="bottom_notification_text">Notifications</string>
     <string name="bottom_acc_text">Profile</string>
+    <string name="bottom_history_text">History</string>
     <string-array name="role">
         <item>Donor</item>
         <item>Needer</item>
@@ -17,4 +18,5 @@
     <string name="phone_number_setup">Phone Number...</string>
     <string name="payment_amount">Payment Amount</string>
     <string name="forget_password">Forgot Password?</string>
+    <string name="default_notification_channel_id">Tvac_CH_01</string>
 </resources>
